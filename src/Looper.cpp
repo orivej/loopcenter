@@ -175,6 +175,7 @@ Looper::Looper(void) {
   params.metroVol = 0.5;
   params.sampPos = 0;
   params.bpMeasure = 4;
+  params.sampPerMeasure = 1;
   params.phraseNum = 0;
   params.priorRecording = false;
   params.recording = false;
