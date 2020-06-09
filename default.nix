@@ -11,7 +11,9 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  NIX_CFLAGS_COMPILE = [ "-Wall" "-Werror" ];
+  NIX_CFLAGS_COMPILE = [ "-Wall" "-Werror" "-ggdb" ];
+
+  dontStrip = true;
 
   meta = with lib; {
     homepage = "https://github.com/orivej/loopcenter";
