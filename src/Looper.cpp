@@ -436,16 +436,15 @@ void Looper::savePhrase(void) {
   phrases[params.phraseNum] = currentPhrase;
 }
 
-void Looper::changePhrase(int phraseDelta) {
+void Looper::setPhrase(int newPhrase) {
 
   stopRecording();
   stopPlaying();
 
-  params.phraseNum = (params.phraseNum + phraseDelta) % NUM_PHRASES;
-  if(params.phraseNum < 0) params.phraseNum += NUM_PHRASES;
   stringstream ostr;
-  ostr << "Setting current phrase to phrase #" << params.phraseNum << "...\n";
+  ostr << "Setting current phrase to phrase #" << newPhrase << "...\n";
   Log(ostr.str());
+  params.phraseNum = newPhrase;
   currentPhrase = phrases[params.phraseNum];
 
   if(params.playing == false) {
@@ -456,6 +455,10 @@ void Looper::changePhrase(int phraseDelta) {
       params.rightButton = "---";
     }
   }
+}
+
+void Looper::changePhrase(int phraseDelta) {
+  setPhrase((params.phraseNum + phraseDelta + NUM_PHRASES) % NUM_PHRASES);
 }
 
 void Looper::deleteLastDub(void) {

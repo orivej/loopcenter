@@ -65,6 +65,7 @@ class Looper : public Thread {
   void setMeter(int newMeter);
   void erasePhrase(void);
   void savePhrase(void);
+  void setPhrase(int newPhrase);
   void changePhrase(int phraseDelta);
   void deleteLastDub(void);
   void deleteAllDubs(void);

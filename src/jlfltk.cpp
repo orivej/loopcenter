@@ -129,6 +129,7 @@ int Key_Window::handle(int event) {
 
 void LooperUI::cb_metroTempo_i(Fl_Spinner*, void*) {
   theLooper->changeTempo(metroTempo->value());
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_metroTempo(Fl_Spinner* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_metroTempo_i(o,v);
@@ -136,6 +137,7 @@ void LooperUI::cb_metroTempo(Fl_Spinner* o, void* v) {
 
 void LooperUI::cb_metroVol_i(Fl_Slider*, void*) {
   theLooper->metroVolume(metroVol->value() / 100.0);
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_metroVol(Fl_Slider* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_metroVol_i(o,v);
@@ -143,13 +145,15 @@ void LooperUI::cb_metroVol(Fl_Slider* o, void* v) {
 
 void LooperUI::cb_bpMeasure_i(Fl_Spinner*, void*) {
   theLooper->setMeter((int) bpMeasure->value());
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_bpMeasure(Fl_Spinner* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_bpMeasure_i(o,v);
 }
 
 void LooperUI::cb_phraseSetter_i(Fl_Spinner*, void*) {
-  theLooper->changePhrase((int) phraseSetter->value());
+  theLooper->setPhrase((int) phraseSetter->value() - 1);
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_phraseSetter(Fl_Spinner* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_phraseSetter_i(o,v);
@@ -157,6 +161,7 @@ void LooperUI::cb_phraseSetter(Fl_Spinner* o, void* v) {
 
 void LooperUI::cb_phraseSaver_i(Fl_Button*, void*) {
   theLooper->savePhrase();
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_phraseSaver(Fl_Button* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_phraseSaver_i(o,v);
@@ -208,6 +213,7 @@ void LooperUI::cb_rightButton(Fl_Light_Button* o, void* v) {
 
 void LooperUI::cb_recordVol_i(Fl_Slider*, void*) {
   theLooper->setRecordVol(recordVol->value() / 100.0);
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_recordVol(Fl_Slider* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_recordVol_i(o,v);
@@ -215,6 +221,7 @@ void LooperUI::cb_recordVol(Fl_Slider* o, void* v) {
 
 void LooperUI::cb_deleteLastDub_i(Fl_Button*, void*) {
   theLooper->deleteLastDub();
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_deleteLastDub(Fl_Button* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_deleteLastDub_i(o,v);
@@ -222,6 +229,7 @@ void LooperUI::cb_deleteLastDub(Fl_Button* o, void* v) {
 
 void LooperUI::cb_deleteAllDubs_i(Fl_Button*, void*) {
   theLooper->deleteAllDubs();
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_deleteAllDubs(Fl_Button* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_deleteAllDubs_i(o,v);
@@ -237,6 +245,7 @@ void LooperUI::cb_tempoTapper(Fl_Button* o, void* v) {
 
 void LooperUI::cb_phraseEraser_i(Fl_Button*, void*) {
   theLooper->erasePhrase();
+  LoopCenter->setButtons();
 }
 void LooperUI::cb_phraseEraser(Fl_Button* o, void* v) {
   ((LooperUI*)(o->parent()->user_data()))->cb_phraseEraser_i(o,v);
