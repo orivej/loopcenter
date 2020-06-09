@@ -1,7 +1,7 @@
 #include "Looper.h"
 #include "timetools.h"
 #include <iostream>
-#include "RtAudio.h"
+#include <RtAudio.h>
 #include <cmath>
 #include "Thread.h"
 #include "main.h"
@@ -20,20 +20,21 @@ int Looper::sampRate;
 Mutex Looper::threadLock;
 bool Looper::overdubWrap;
 
-int playRec(char *buffer, int numSamp, void *) {  
+int playRec(void *outputBuffer, void *inputBuffer, unsigned numSamp, double, RtAudioStreamStatus, void *) {
 
   Locker locker(Looper::threadLock);
 
   if(!Looper::params.playing && !Looper::params.priorRecording) {
     // play silence:
-    float *myBuf = (float *) buffer;
+    float *outBuf = (float *) outputBuffer;
+    float *inBuf = (float *) inputBuffer;
     lev = 0.0;
     int curSampPos = Looper::params.sampPos;
     int sampPerMeasure = Looper::params.sampPerMeasure;
     int bpMeas = Looper::params.bpMeasure;
     int beepSampLen = (int) (BEEP_LEN * Looper::sampRate);
-    for(int i = 0; i < numSamp; i++) {
-      if(fabs(*myBuf) > lev) lev = fabs(*myBuf);
+    for(unsigned i = 0; i < numSamp; i++) {
+      if(fabs(*inBuf) > lev) lev = fabs(*inBuf);
 
       if(curSampPos >= sampPerMeasure) {
 	curSampPos = 0;
@@ -53,8 +54,9 @@ int playRec(char *buffer, int numSamp, void *) {
 	outVal += Looper::params.metroVol * sin(2.0 * PI * freq * curSampPos / Looper::sampRate);
       }
 
-      *myBuf = outVal;
-      myBuf++;
+      *outBuf = outVal;
+      outBuf++;
+      inBuf++;
       curSampPos++;
     }
     Looper::params.sampPos = curSampPos;
@@ -63,15 +65,16 @@ int playRec(char *buffer, int numSamp, void *) {
   }
 
   // add in the metronome track:
-  float *myBuf = (float *) buffer;
+  float *outBuf = (float *) outputBuffer;
+  float *inBuf = (float *) inputBuffer;
   float measTime, outVal;
   int curSampPos = Looper::params.sampPos;
   int bpMeas = Looper::params.bpMeasure;
   int sampPerMeasure = Looper::params.sampPerMeasure;
   int beepSampLen = (int) (BEEP_LEN * Looper::sampRate);
   lev = 0.0;
-  for(int i = 0; i < numSamp; i++) {
-    if(fabs(*myBuf) > lev) lev = fabs(*myBuf);
+  for(unsigned i = 0; i < numSamp; i++) {
+    if(fabs(*inBuf) > lev) lev = fabs(*inBuf);
 
     // if we're not recording, and not prior recording, and the sample position is beyond the end
     // of the current and old overdub tracks, then reset the position to
@@ -97,9 +100,10 @@ int playRec(char *buffer, int numSamp, void *) {
 
     // if we're prior recording, then check to see if it's time to switch to recording:
     if(Looper::params.priorRecording) {
-      *myBuf = outVal;
+      *outBuf = outVal;
       curSampPos++;
-      myBuf++;
+      outBuf++;
+      inBuf++;
       if(curSampPos == sampPerMeasure) {
 	Looper::params.recording = true;
 	Looper::params.priorRecording = false;
@@ -145,13 +149,14 @@ int playRec(char *buffer, int numSamp, void *) {
 	  Looper::currentPhrase.currentOverdub.resize(Looper::currentPhrase.currentOverdubMeasures * sampPerMeasure, 0.0);
 	}
       }
-      Looper::currentPhrase.currentOverdub[curSampPos] = Looper::params.recVolume * (*myBuf);
+      Looper::currentPhrase.currentOverdub[curSampPos] = Looper::params.recVolume * (*inBuf);
     }
 
     if(outVal > 1.0) outVal = 1.0;
     else if(outVal < -1.0) outVal = -1.0;
-    (*myBuf) = outVal;
-    myBuf++;
+    (*outBuf) = outVal;
+    outBuf++;
+    inBuf++;
     curSampPos++;
   }
   Looper::params.recLevel = Looper::params.recVolume * lev;
@@ -186,7 +191,7 @@ void Looper::Execute(void) {
 
   int channels = 1;
   sampRate = -1;
-  int bufferSize = 2048;
+  unsigned bufferSize = 2048;
   int nBuffers = 4;
   int device = 0;
   RtAudio *audio = 0;
@@ -200,8 +205,8 @@ void Looper::Execute(void) {
       exit(1);
     }
 
-    RtAudioDeviceInfo info;
-    for(int i = 1; i <= devices; i++) {
+    RtAudio::DeviceInfo info;
+    for(int i = 0; i < devices; i++) {
       info = audio->getDeviceInfo(i);
       //      cout << "i: " << i << "\nprobed? " << info.probed << "\nduplex channels: " << info.duplexChannels << "\ndefault? " << info.isDefault << endl;
       /*      if(info.probed && info.isDefault) {
@@ -209,7 +214,7 @@ void Looper::Execute(void) {
 	break;
 	}*/
     }
-    device = 1;
+    device = 0;
     info = audio->getDeviceInfo(device);
 
     if(info.duplexChannels == 0) {
@@ -220,12 +225,12 @@ void Looper::Execute(void) {
     for(int i = 0; i < (int) info.sampleRates.size(); i++) {
       //      cout << "sample rate: " << info.sampleRates[i] << endl;
       if(sampRate < 0) sampRate = info.sampleRates[i];
-      if(abs(info.sampleRates[i] - DESIRED_SAMP_RATE) < abs(sampRate - DESIRED_SAMP_RATE)) {
+      if(abs((int) info.sampleRates[i] - DESIRED_SAMP_RATE) < abs(sampRate - DESIRED_SAMP_RATE)) {
 	sampRate = info.sampleRates[i];
       }
     }
   }
-  catch (RtError &error) {
+  catch (RtAudioError &error) {
     error.printMessage();
     exit(EXIT_FAILURE);
   }
@@ -237,23 +242,26 @@ void Looper::Execute(void) {
 
 
   // Open a stream during RtAudio instantiation
+  RtAudio::StreamParameters rtparams;
+  rtparams.deviceId = device;
+  rtparams.nChannels = channels;
+  RtAudio::StreamOptions rtopts;
+  rtopts.numberOfBuffers = nBuffers;
   try {
-    audio = new RtAudio(device, channels, device, channels, RTAUDIO_FLOAT32,
-                        sampRate, &bufferSize, nBuffers);
+    audio = new RtAudio();
+    audio->openStream(&rtparams, &rtparams, RTAUDIO_FLOAT32,
+                      sampRate, &bufferSize, &playRec, NULL, &rtopts, NULL);
   }
-  catch (RtError &error) {
+  catch (RtAudioError &error) {
     error.printMessage();
     exit(EXIT_FAILURE);
   }
 
   try {
-    // Set the stream callback function
-    audio->setStreamCallback(&playRec, NULL);
-    AccuSleep(1.0);
     // Start the stream
     audio->startStream();
   }
-  catch (RtError &error) {
+  catch (RtAudioError &error) {
     error.printMessage();
     goto cleanup;
   }
@@ -269,7 +277,7 @@ void Looper::Execute(void) {
     audio->stopStream();
     audio->closeStream();
   }
-  catch (RtError &error) {
+  catch (RtAudioError &error) {
     error.printMessage();
   }
 
