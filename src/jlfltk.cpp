@@ -50,7 +50,7 @@ Key_Window::Key_Window(int x, int y, const char *lab) : Fl_Double_Window(x, y, l
 
 int Key_Window::handle(int event) {
 
-  char ch;
+  int ch;
   switch(event) {
   case FL_FOCUS:
     //    cout << "focus\n";
@@ -60,64 +60,64 @@ int Key_Window::handle(int event) {
     return 1;
   case FL_KEYDOWN:
     ch = Fl::event_key();
-    Log(string("recieved key '") + ch + "'\n");
-    if(Fl::event_key() == '[') {
+    Log(string("recieved key '") + char(ch) + "'\n");
+    if(ch == '[') {
       theLooper->metronomeQuieter();
       metroVol->value(theLooper->params.metroVol * 100.0);
     }
-    else if(Fl::event_key() == ']') {
+    else if(ch == ']') {
       theLooper->metronomeLouder();
       metroVol->value(theLooper->params.metroVol * 100.0);
     }
-    else if(Fl::event_key() == FL_Up) {
+    else if(ch == FL_Up) {
       theLooper->changeTempoDelta(1.0);
       metroTempo->value((int) theLooper->params.bpMin);
     }
-    else if(Fl::event_key() == FL_Down) {
+    else if(ch == FL_Down) {
       theLooper->changeTempoDelta(-1.0);
       metroTempo->value((int) theLooper->params.bpMin);
     }
-    else if(Fl::event_key() == '-') {
+    else if(ch == '-') {
       theLooper->changeRecordVol(-0.05);
       recordVol->value(theLooper->params.recVolume * 100.0);
     }
-    else if(Fl::event_key() == '=') {
+    else if(ch == '=') {
       theLooper->changeRecordVol(0.05);
       recordVol->value(theLooper->params.recVolume * 100.0);
     }
-    else if(Fl::event_key() == 'a') {
+    else if(ch == 'a') {
       theLooper->changeMeter(1);
       bpMeasure->value(theLooper->params.bpMeasure);
     }
-    else if(Fl::event_key() == 'z') {
+    else if(ch == 'z') {
       theLooper->changeMeter(-1);
       bpMeasure->value(theLooper->params.bpMeasure);
     }
-    else if(Fl::event_key() == 'e') {
+    else if(ch == 'e') {
       theLooper->erasePhrase();
     }
-    else if(Fl::event_key() == 's') {
+    else if(ch == 's') {
       theLooper->savePhrase();
     }
-    else if(Fl::event_key() == 'd') {
+    else if(ch == 'd') {
       theLooper->deleteAllDubs();
     }
-    else if(Fl::event_key() == 'k') {
+    else if(ch == 'k') {
       theLooper->deleteLastDub();
     }
-    else if(Fl::event_key() == 't') {
+    else if(ch == 't') {
       theLooper->tempoTap();
     }
-    else if(Fl::event_key() == FL_Left) {
+    else if(ch == FL_Left) {
       theLooper->changePhrase(-1);
     }
-    else if(Fl::event_key() == FL_Right) {
+    else if(ch == FL_Right) {
       theLooper->changePhrase(1);
     }
-    else if(Fl::event_key() == 32) {
+    else if(ch == ' ') {
       theLooper->leftButton();
     }
-    else if(Fl::event_key() == FL_Enter) {
+    else if(ch == FL_Enter || ch == FL_KP_Enter) {
       theLooper->rightButton();
     }
     this->setButtons();
