@@ -11,6 +11,8 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  NIX_CFLAGS_COMPILE = [ "-Wall" "-Werror" ];
+
   meta = with lib; {
     homepage = "https://github.com/orivej/loopcenter";
     description = "Easily record loops, play and overdub them, as with loop pedals";

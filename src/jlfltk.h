@@ -17,7 +17,7 @@
 class Key_Window : public Fl_Double_Window {
 
  public:
-  Key_Window(int x, int y, char *lab);
+  Key_Window(int x, int y, const char *lab);
   void setButtons(void);
 
   Looper *theLooper;

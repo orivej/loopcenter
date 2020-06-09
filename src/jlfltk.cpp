@@ -46,7 +46,7 @@ void LooperUI::updateStuff(void) {
   Fl::awake(this->LoopCenter);
 }
 
-Key_Window::Key_Window(int x, int y, char *lab) : Fl_Double_Window(x, y, lab) {}
+Key_Window::Key_Window(int x, int y, const char *lab) : Fl_Double_Window(x, y, lab) {}
 
 int Key_Window::handle(int event) {
 
