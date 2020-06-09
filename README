@@ -1,0 +1,33 @@
+loopcenter
+==========
+Nick Choly <ncholy@gmail.com>
+
+What is loopcenter?
+-------------------
+loopcenter is a program that lets you easily record loops and play or overdub over them.
+It is very similar to the "Loop Station" guitar pedal.
+Basic usage might be:
+	(1) Set the desired tempo
+	(2) Record a chord progression
+	(3) Overdub a melody
+	(4) Play a solo over both
+All key bindings are written on the GUI buttons themselves, so it should be 
+pretty simple to use.
+I made this program without being aware of the similar, more complete project
+SooperLooper (http://essej.net/sooperlooper/), but I recommend you check that
+out, too.
+
+What is required to install loopcenter?
+---------------------------------------
+You'll need:
+	-The JACK audio server and development files (http://jackaudio.org/)
+	-The FLTK GUI toolkit (http://www.fltk.org/)
+
+What systems does it run on?
+----------------------------
+I've only tested it on my i686 linux box, but (in principle) it should compile
+and run fine on OS X.  In fact, without too much work, it should be able to compile
+for windows, because FLTK compiles for windows, and the audio bits are done with
+RtAudio (http://www.music.mcgill.ca/~gary/rtaudio/), which can compile for 
+Windows DirectSound and ASIO with only a change in the compilation flags.
+
