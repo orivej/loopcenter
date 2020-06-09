@@ -1,5 +1,7 @@
 # Loopcenter
 
+Note: https://github.com/orivej/loopcenter is a fork of http://loopcenter.sourceforge.net/ . "I" in the readmes refers to the original author Nick Choly.
+
 ## What it is
 
 Loopcenter is a program I wrote basically as a music-practicing tool. I didn't want to shell out for a Boss Loop Station guitar pedal, and I figured I could achieve the same functionality pretty easily with a simple program. The result was 'Loopcenter'.
